@@ -1,150 +1,189 @@
-const canvas = document.getElementById('canvas')
-const ctx = canvas.getContext('2d')
+// VARIABLES ************************************************************************************
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
-let score;
+let score = 0;
 let gravity;
-let gameSpeed;
 let keys = {};
+let gameSpeed = 3;
+let isJumping = false;
 
-// eventListeners
-document.addEventListener("keydown", function (evt){
-    keys[evt.code] = true;
-});
-document.addEventListener("keyup", function(evt){
-    keys[evt.code] = false;
-})
+let player;
+
+let loadedImages = {};
+
+const imageLinks = [
+  { link: "./images/background1.gif", name: "background" },
+  { link: "./images/player.png", name: "player" },
+  { link: "./images/apple.png", name: "apple" },
+  { link: "./images/tnt.png", name: "tnt" },
+  { link: "./images/score.png", name: "score" },
+];
+let counterForLoadedImages = 0;
+// MUSICA
+let soundTrack = new Audio("");
+soundTrack.volume = 0.3;
+soundTrack.preload = "auto";
+soundTrack.load();
+
+// FUNCTIONS ************************************************************************************
+const drawBackground = () => {
+  ctx.drawImage(loadedImages.background, 0.5, 0);
+};
+// const drawPlayer = () =>{
+//     ctx.drawImage(loadedImages.player,player.x,player.y,player.width,player.height)
+// }
+const drawApple = () => {
+  ctx.drawImage(loadedImages.apple, 300, 230, 20, 20);
+};
+const drawTnt = () => {
+  ctx.drawImage(loadedImages.tnt, 500, 226, 30, 30);
+};
+const drawScore = () => {
+  ctx.drawImage(loadedImages.score, 0, 0, 30, 30);
+};
+
+const loadImages = () => {
+  imageLinks.forEach((imagen) => {
+    const img = new Image();
+    img.src = imagen.link;
+    img.onload = () => {
+      counterForLoadedImages++;
+      loadedImages[imagen.name] = img;
+
+      //   if (imageLinks.length === counterForLoadedImages) {
+
+      //   }
+    };
+  });
+};
+
+const startGame = () => {
+  document.getElementById("start-button").style.display = "none";
+
+  player = new Player();
+  loadImages();
+
+  //crear player
+  //llamar a funcion de crear array obstaculos
+  //...
+  //llamar al loop del juego updateCanvas()
+  updateCanvas();
+};
+
+const updateCanvas = () => {
+  //   ctx.font = "20px PressStart2P-Regular";
+
+  if (imageLinks.length === counterForLoadedImages) {
+    drawBackground();
+    player.draw();
+    player.update();
+    checkIfInBounds ();
+    
 
 
-loadedImages = {}
+    // arrayManzanas.forEach((manzana) => {
+    //   manzana.draw();
+    //   manzana.update();
+    // });
+  }
 
+  requestAnimationFrame(updateCanvas);
+};
 
-//FUNCTIONS
-const drawBackground = () =>{
-    ctx.drawImage(loadedImages.background,0.5,0)
-}
-const drawPlayer = () =>{
-    ctx.drawImage(loadedImages.player,player.x,player.y,player.width,player.height)
-}
-const drawApple = () =>{
-    ctx.drawImage(loadedImages.apple,300,230,20,20)
-}
-const drawTnt = () =>{
-    ctx.drawImage(loadedImages.tnt,500,226,30,30)
-}
-const drawScore = () =>{
-    ctx.drawImage(loadedImages.score,0,0,30,30)
-}
-
-function Animate () {
-    //jump
-    if (keys["space"]) {
-        player.jump();
-    } else  {
-        player.jumpTimer = 0;
+const checkIfInBounds = ()=>{
+    if (player.y >300){
+        player.y =300
     }
-        player.y += player.dy;
-    // gravity
-    if (player.y + player.height < canvas.height) {
-        player.dy += gravity;
-        player.grounded = false;
-    } else {
-        player.dy = 0;
-        player.grounded = true;
-        player.y = cavnas.height - player.height;
-         }
-         player.y += player.dy;
-         player.draw();
-}
 
-function jump () {
-    if (player.grounded && player.jumpTimer==0) { 
-    player.jumpTimer = 1;
-    player.dy = -player.jumpForce;
-    } else if (player.jumpTimer > 0 && player.jumpTimer<15) {
-        player.jumpTimer++;
-        player.dy = -player.jumpForce -(player.jumpTimer/50);
+    if(player.y < 5){
+        player.y = 5
     }
+
 }
 
-//CLASSES
+// CLASSES ********************************************************************************
+
 class Player {
-    constructor () {
-        this.x = 0;
-        this.y =158;
-        this.width = 100;
-        this.height = 100;
-        this.dy = 0;
-        this.jumpForce = 15;
-        this.originalHeight = this.height;
-        this.grounded = false;
-        this.jumpTimer = 0;
+  constructor() {
+    this.x = 0;
+    this.y = 158;
+    this.width = 100;
+    this.height = 100;
+    this.vy = 0;
+    this.gravity = 15;
+    this.weight = 0.17;
+  }
+
+  jump() {
+    this.vy = -6.9;
+  }
+
+  draw() {
+    ctx.drawImage(loadedImages.player, this.x, this.y, this.width, this.height);
+  }
+
+  update() {
+    //actualizamos la posicion
+    this.y += this.vy;
+
+    //Para cuando encuentra el suelo
+    if (this.y + this.height >= canvas.height) {
+      this.y = 170;
+      this.vy = 0;
     }
+
+    //Cuando la velocidad vertical es menor que la gravedad le sumamos el peso, para que baje
+    if (this.vy < this.gravity) {
+      this.vy += this.weight;
+    }
+  }
 }
-const player = new Player ()
+
 class Apple {
-    constructor () {
-        this.x = 300;
-        this.y =230;
-        this.width = 20;
-        this.height = 20;
-    }
+  constructor() {
+    this.x = 300;
+    this.y = 230;
+    this.width = 20;
+    this.height = 20;
+  }
+  draw() {}
+  update() {}
 }
+
 class tnt {
-    constructor () {
-        this.x = 500;
-        this.y =226;
-        this.width = 30;
-        this.height = 30;
-    }
+  constructor() {
+    this.x = 500;
+    this.y = 226;
+    this.width = 30;
+    this.height = 30;
+  }
+  draw() {}
+  update() {}
 }
+
 class Score {
-    constructor () {
-        this.x = 0;
-        this.y =0;
-        this.width = 30;
-        this.height = 30;
-    }
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.width = 30;
+    this.height = 30;
+  }
 }
- 
 
-
-
-
-const imageLinks = [ 
-    {link: "./images/background1.gif", name: 'background'},
-    {link: "./images/player.png", name: 'player'},
-    {link: "./images/apple.png", name: 'apple'},
-    {link: "./images/tnt.png", name: 'tnt'},
-    {link: "./images/score.png", name: 'score'},
-
-
-  ]
-  
-  let counterForLoadedImages = 0;
-  
-  imageLinks.forEach((imagen)=>{ 
-    const img = new Image() 
-    img.src = imagen.link 
-    img.onload = ()=>{ 
-      counterForLoadedImages++ 
-      loadedImages[imagen.name] = img
-      if(imageLinks.length === counterForLoadedImages){ 
-       
-      }
+window.addEventListener("load", (event) => {
+  // eventListeners
+  document.addEventListener("keydown", function (evt) {
+    if (evt.key === " ") {
+      isJumping = true;
+      player.jump();
     }
-  })
-  const updateCanvas = ()=>{
-      ctx.font = "20px PressStart2P-Regular";
-      gameSpeed = 3;
-      gravity = 1;
-      score = 0;
-    if(imageLinks.length === counterForLoadedImages){
-        drawBackground()
-        drawPlayer()
-        
+  });
+  document.addEventListener("keyup", function (evt) {
+    if (evt.key === " ") {
+      isJumping = false;
     }
+  });
 
-
-    requestAnimationFrame(updateCanvas)
-}
-updateCanvas()
+  document.getElementById("start-button").addEventListener("click", startGame);
+});
