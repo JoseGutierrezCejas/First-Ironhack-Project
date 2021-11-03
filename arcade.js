@@ -28,7 +28,7 @@ const imageLinks = [
   { link: "./images/apple.png", name: "apple" },
   { link: "./images/tnt.png", name: "tnt" },
   { link: "./images/score.png", name: "score" },
-  { link: "./images/game over.png", name: "endGame" },
+  { link: "./images/game over.png", name: "gameOver" },
 
 ];
 let counterForLoadedImages = 0;
@@ -64,7 +64,7 @@ const checkApplesCollision = ()=>{
                 apple.eaten = true;
                 score++
                 // document.getElementById('score-counter').innerText = score 
-                console.log (score)
+                //console.log (score)
             }
 })
 }
@@ -75,13 +75,20 @@ const checkTntCollision = ()=>{
             tnt.x + tnt.width >= player.x &&
             tnt.y < player.y + player.height &&
             tnt.height + tnt.y > player.y){
-                endGame()
+                endGame=true;
                  
             
             }
 })
 }
 
+const loadFirstImage = ()=> {
+const imagen1= new Image()
+imagen1.src="./images/start1.png";
+imagen1.onload= () =>{
+    ctx.drawImage(imagen1, 0, 40);
+}
+}
 
 const loadImages = () => {
   imageLinks.forEach((imagen) => {
@@ -105,38 +112,30 @@ soundTrack.play();
   loadImages();
   createApples();
   createTnt();
-
-  //crear player
-  //llamar a funcion de crear array obstaculos
-  //...
-  //llamar al loop del juego updateCanvas()
   updateCanvas();
 };
-
+let endGame=false;
 const updateCanvas = () => {
-  //   ctx.font = "20px PressStart2P-Regular";
-
-  if (imageLinks.length === counterForLoadedImages) {
-    drawBackground();
-    player.draw();
-    player.update();
-    checkIfInBounds ();
-    updateApple(arrayManzanas);
-    drawApple();
-    checkApplesCollision();
-    deleteApples();
-    updateTnt(arrayTnt);
-    drawTnt();
-    checkTntCollision();
-    drawScore();
-
-
-
-    // arrayManzanas.forEach((manzana) => {
-    //   manzana.draw();
-    //   manzana.update();
-    // });
+  if (!endGame){
+    if (imageLinks.length === counterForLoadedImages) {
+        drawBackground();
+        player.draw();
+        player.update();
+        checkIfInBounds ();
+        updateApple(arrayManzanas);
+        drawApple();
+        checkApplesCollision();
+        deleteApples();
+        updateTnt(arrayTnt);
+        drawTnt();
+        checkTntCollision();
+        drawScore();
+      }   
+  }else {
+    gameOver()
+ 
   }
+
 
   requestAnimationFrame(updateCanvas);
 };
@@ -212,10 +211,10 @@ const drawTnt = ()=>{
 
     })
 }
-const endGame = ()=>{
-    ctx.drawImage(loadedImages.endGame,0,0,560,270)
+const gameOver = ()=>{
+    ctx.drawImage(loadedImages.gameOver,0,0,560,270)
     soundTrack.pause()
-    cancelAnimationFrame()
+
 }
 
 // CLASSES ********************************************************************************
@@ -295,7 +294,8 @@ class Score {
 }
 
 window.addEventListener("load", (event) => {
-  // eventListeners
+    loadFirstImage()
+    // eventListeners
   document.addEventListener("keydown", function (evt) {
     if (evt.key === " ") {
       isJumping = true;
