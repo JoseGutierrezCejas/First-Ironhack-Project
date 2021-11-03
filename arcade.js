@@ -24,7 +24,7 @@ const imageLinks = [
 ];
 let counterForLoadedImages = 0;
 // MUSICA
-let soundTrack = new Audio("");
+let soundTrack = new Audio("./Crash Bandicoot Trilogy 8 Bit Medley.mp3");
 soundTrack.volume = 0.3;
 soundTrack.preload = "auto";
 soundTrack.load();
@@ -54,8 +54,8 @@ const checkApplesCollision = ()=>{
             apple.height + apple.y > player.y){
                 apple.eaten = true;
                 score++
-                document.getElementById('score-counter').innerText = score 
-                // console.log (score)
+                // document.getElementById('score-counter').innerText = score 
+                console.log (score)
             }
 })
 }
@@ -91,10 +91,11 @@ const loadImages = () => {
 
 const startGame = () => {
   document.getElementById("start-button").style.display = "none";
-
+soundTrack.play();
   player = new Player();
   loadImages();
-  createApples ();
+  createApples();
+  createTnt();
 
   //crear player
   //llamar a funcion de crear array obstaculos
@@ -115,7 +116,10 @@ const updateCanvas = () => {
     drawApple();
     checkApplesCollision();
     deleteApples();
-    
+    updateTnt(arrayTnt);
+    drawTnt();
+    checkTntCollision();
+
 
 
 
@@ -135,19 +139,19 @@ const deleteApples =()=>{
 }
 
 const checkIfInBounds = ()=>{
-    if (player.y >300){
-        player.y =300
+    if (player.y >310){
+        player.y =310
     }
 
-    if(player.y < 5){
-        player.y = 5
+    if(player.y < 0){
+        player.y = 0
     }
-    if (player.x >510){
-        player.x =510
+    if (player.x >500){
+        player.x =500
     }
 
-    if(player.x < 5){
-        player.x = 5
+    if(player.x < 15){
+        player.x =15 
     }
 
 }
@@ -156,7 +160,7 @@ const createApples = () => {
 
     let createApplesIntervalID = setInterval(()=>{
         arrayManzanas.push (new Apple())
-        console.log (arrayManzanas)
+        // console.log (arrayManzanas)
     },1500)   
 }
 const updateApple = (arrManzanas)=>{
@@ -179,23 +183,23 @@ const drawApple = ()=>{
 const createTnt = () => {
 
     let createTntIntervalID = setInterval(()=>{
-        arrayTnt.push (new Tnt())
-        console.log (arrayTnt)
-    },1500)   
+        arrayTnt.push(new Tnt())
+        // console.log(arrayTnt)
+    },2000)   
 }
 const updateTnt = (arrTnt)=>{
 
 
     arrTnt.forEach((tnt) => {
-
-        tnt.y += tnt.speed
+  
+        tnt.x -= tnt.speed
     })
 
 }
 
 const drawTnt = ()=>{
     arrayTnt.forEach((tnt)=>{
-    ctx.drawImage(loadedImages.tnt, 300, 230, 20, 20);
+    ctx.drawImage(loadedImages.tnt, tnt.x, tnt.y, tnt.width, tnt.height);
 
     })
 }
@@ -254,16 +258,18 @@ class Apple {
   //update() {}
 }
 
-class tnt {
+class Tnt {
+
   constructor() {
     this.x = 500;
     this.y = 226;
     this.width = 30;
     this.height = 30;
     this.touched = false;
+    this.speed = 2
   }
   draw() {}
-  update() {}
+  //update() {}
 }
 
 class Score {
