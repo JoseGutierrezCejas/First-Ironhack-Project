@@ -8,13 +8,16 @@
     <title>Arcade</title>
   </head>
   <body>
+    <div id="background"></div>
     <div class="game-intro">
       <img src="" alt="" class="" />
       <br />
       <button id="start-button">StartGame</button>
       <p>Use the space bar to jump and avoid the obstacles!</p>
+      <div id="score-board">
+        <p id> Score: <span id="score-counter"> 0 </span></p>
     </div>
-
+    
     <div id="game-board">
       <canvas id="canvas" width="560" height="270"></canvas>
     </div>

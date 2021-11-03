@@ -1,17 +1,16 @@
 body {
-  background-image: url("");
-  background-size:1000px;;
+  background-image: url("/images/recreativo oche.png");
+  background-size: 1000px;
   background-repeat: no-repeat;
   background-position: center;
+  background-color:;
 }
 
 canvas {
-  border: 1px solid black;
   padding-left: 0;
   padding-right: 0;
   margin-left: auto;
   margin-right: auto;
   display: block;
-  
 }
 

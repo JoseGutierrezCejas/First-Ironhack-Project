@@ -2,11 +2,14 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+
 let score = 0;
 let gravity;
 let keys = {};
 let gameSpeed = 3;
 let isJumping = false;
+let arrayManzanas = [];
+let arrayTnt = [];
 
 let player;
 
@@ -28,20 +31,48 @@ soundTrack.load();
 
 // FUNCTIONS ************************************************************************************
 const drawBackground = () => {
-  ctx.drawImage(loadedImages.background, 0.5, 0);
+  ctx.drawImage(loadedImages.background, 0, 0);
 };
 // const drawPlayer = () =>{
 //     ctx.drawImage(loadedImages.player,player.x,player.y,player.width,player.height)
 // }
-const drawApple = () => {
-  ctx.drawImage(loadedImages.apple, 300, 230, 20, 20);
-};
-const drawTnt = () => {
-  ctx.drawImage(loadedImages.tnt, 500, 226, 30, 30);
-};
+//const drawApple = () => {
+  //ctx.drawImage(loadedImages.apple, 300, 230, 20, 20);
+//};
+//const drawTnt = () => {
+  //ctx.drawImage(loadedImages.tnt, 500, 226, 30, 30);
+//};
 const drawScore = () => {
   ctx.drawImage(loadedImages.score, 0, 0, 30, 30);
 };
+
+const checkApplesCollision = ()=>{
+    arrayManzanas.forEach((apple)=>{
+        if (apple.x < player.x + player.width &&
+            apple.x + apple.width > player.x &&
+            apple.y < player.y + player.height &&
+            apple.height + apple.y > player.y){
+                apple.eaten = true;
+                score++
+                document.getElementById('score-counter').innerText = score 
+                // console.log (score)
+            }
+})
+}
+
+const checkTntCollision = ()=>{
+    arrayTnt.forEach((tnt)=>{
+        if (tnt.x < player.x + player.width &&
+            tnt.x + tnt.width > player.x &&
+            tnt.y < player.y + player.height &&
+            tnt.height + tnt.y > player.y){
+                tnt.touched = true;
+                 
+            
+            }
+})
+}
+
 
 const loadImages = () => {
   imageLinks.forEach((imagen) => {
@@ -63,6 +94,7 @@ const startGame = () => {
 
   player = new Player();
   loadImages();
+  createApples ();
 
   //crear player
   //llamar a funcion de crear array obstaculos
@@ -79,7 +111,12 @@ const updateCanvas = () => {
     player.draw();
     player.update();
     checkIfInBounds ();
+    updateApple(arrayManzanas);
+    drawApple();
+    checkApplesCollision();
+    deleteApples();
     
+
 
 
     // arrayManzanas.forEach((manzana) => {
@@ -91,6 +128,12 @@ const updateCanvas = () => {
   requestAnimationFrame(updateCanvas);
 };
 
+const deleteApples =()=>{
+    arrayManzanas = arrayManzanas.filter((apple)=>{
+        return !apple.eaten
+    })
+}
+
 const checkIfInBounds = ()=>{
     if (player.y >300){
         player.y =300
@@ -99,8 +142,64 @@ const checkIfInBounds = ()=>{
     if(player.y < 5){
         player.y = 5
     }
+    if (player.x >510){
+        player.x =510
+    }
+
+    if(player.x < 5){
+        player.x = 5
+    }
 
 }
+// para que aparezcan las manzanas en movimiento
+const createApples = () => {
+
+    let createApplesIntervalID = setInterval(()=>{
+        arrayManzanas.push (new Apple())
+        console.log (arrayManzanas)
+    },1500)   
+}
+const updateApple = (arrManzanas)=>{
+
+
+    arrManzanas.forEach((manzana) => {
+
+        manzana.y += manzana.speed
+    })
+
+}
+
+const drawApple = ()=>{
+    arrayManzanas.forEach((apple)=>{
+    ctx.drawImage(loadedImages.apple, apple.x, apple.y, apple.width,apple.height );
+
+    })
+}
+// para que aparezcan los tnt en movimiento
+const createTnt = () => {
+
+    let createTntIntervalID = setInterval(()=>{
+        arrayTnt.push (new Tnt())
+        console.log (arrayTnt)
+    },1500)   
+}
+const updateTnt = (arrTnt)=>{
+
+
+    arrTnt.forEach((tnt) => {
+
+        tnt.y += tnt.speed
+    })
+
+}
+
+const drawTnt = ()=>{
+    arrayTnt.forEach((tnt)=>{
+    ctx.drawImage(loadedImages.tnt, 300, 230, 20, 20);
+
+    })
+}
+
 
 // CLASSES ********************************************************************************
 
@@ -113,6 +212,7 @@ class Player {
     this.vy = 0;
     this.gravity = 15;
     this.weight = 0.17;
+    this.speed = 0;
   }
 
   jump() {
@@ -126,6 +226,7 @@ class Player {
   update() {
     //actualizamos la posicion
     this.y += this.vy;
+    player.x += player.speed;
 
     //Para cuando encuentra el suelo
     if (this.y + this.height >= canvas.height) {
@@ -142,13 +243,15 @@ class Player {
 
 class Apple {
   constructor() {
-    this.x = 300;
-    this.y = 230;
+    this.eaten= false;
+    this.x = Math.floor(Math.random() * 560);
+    this.y = 0;
     this.width = 20;
     this.height = 20;
+    this.speed = 3;
   }
   draw() {}
-  update() {}
+  //update() {}
 }
 
 class tnt {
@@ -157,6 +260,7 @@ class tnt {
     this.y = 226;
     this.width = 30;
     this.height = 30;
+    this.touched = false;
   }
   draw() {}
   update() {}
@@ -183,7 +287,20 @@ window.addEventListener("load", (event) => {
     if (evt.key === " ") {
       isJumping = false;
     }
+    
   });
+  document.addEventListener('keydown',(event)=>{
+    if (event.key === "ArrowRight"){
+        player.speed = 8
+    }else if (event.key === "ArrowLeft"){
+        player.speed= -8
+    }
+})
 
+document.addEventListener ('keyup',(event)=>{
+    if (event.key === "ArrowRight" || event.key === "ArrowLeft"){
+        player.speed = 0 
+    }
+})
   document.getElementById("start-button").addEventListener("click", startGame);
 });
