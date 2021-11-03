@@ -11,9 +11,16 @@ let isJumping = false;
 let arrayManzanas = [];
 let arrayTnt = [];
 
+
 let player;
 
 let loadedImages = {};
+const drawScore = ()=>{
+    ctx.drawImage(loadedImages.score,35,0,30,30)
+    ctx.font = "20px fantasy";
+    ctx.fillStyle = "black";
+    ctx.fillText(+score,65,20);
+}
 
 const imageLinks = [
   { link: "./images/background1.gif", name: "background" },
@@ -21,6 +28,8 @@ const imageLinks = [
   { link: "./images/apple.png", name: "apple" },
   { link: "./images/tnt.png", name: "tnt" },
   { link: "./images/score.png", name: "score" },
+  { link: "./images/game over.png", name: "endGame" },
+
 ];
 let counterForLoadedImages = 0;
 // MUSICA
@@ -42,9 +51,9 @@ const drawBackground = () => {
 //const drawTnt = () => {
   //ctx.drawImage(loadedImages.tnt, 500, 226, 30, 30);
 //};
-const drawScore = () => {
-  ctx.drawImage(loadedImages.score, 0, 0, 30, 30);
-};
+//const drawScore = () => {
+  //ctx.drawImage(loadedImages.score, 0, 0, 30, 30);
+
 
 const checkApplesCollision = ()=>{
     arrayManzanas.forEach((apple)=>{
@@ -62,11 +71,11 @@ const checkApplesCollision = ()=>{
 
 const checkTntCollision = ()=>{
     arrayTnt.forEach((tnt)=>{
-        if (tnt.x < player.x + player.width &&
-            tnt.x + tnt.width > player.x &&
+        if (tnt.x <= player.x + player.width - 70 &&
+            tnt.x + tnt.width >= player.x &&
             tnt.y < player.y + player.height &&
             tnt.height + tnt.y > player.y){
-                tnt.touched = true;
+                endGame()
                  
             
             }
@@ -119,7 +128,7 @@ const updateCanvas = () => {
     updateTnt(arrayTnt);
     drawTnt();
     checkTntCollision();
-
+    drawScore();
 
 
 
@@ -203,7 +212,11 @@ const drawTnt = ()=>{
 
     })
 }
-
+const endGame = ()=>{
+    ctx.drawImage(loadedImages.endGame,0,0,560,270)
+    soundTrack.pause()
+    cancelAnimationFrame()
+}
 
 // CLASSES ********************************************************************************
 
