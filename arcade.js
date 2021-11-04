@@ -84,7 +84,7 @@ const checkTntCollision = ()=>{
 
 const loadFirstImage = ()=> {
 const imagen1= new Image()
-imagen1.src="./images/start1.png";
+imagen1.src="./images/startbutton.png";
 imagen1.onload= () =>{
     ctx.drawImage(imagen1, 0, 40);
 }
