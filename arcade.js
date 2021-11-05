@@ -16,7 +16,7 @@ let player;
 
 let loadedImages = {};
 const drawScore = ()=>{
-    ctx.drawImage(loadedImages.score,35,0,30,30)
+    ctx.drawImage(loadedImages.apple,35,0,20,20)
     ctx.font = "20px fantasy";
     ctx.fillStyle = "black";
     ctx.fillText(+score,65,20);
